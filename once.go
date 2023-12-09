@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-func RunOnce(callback Callback) {
+func RunOnce(callbacks map[string]Callback) {
 	data, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		writeError(os.Stdout, err.Error())
@@ -28,7 +28,7 @@ func RunOnce(callback Callback) {
 		os.Exit(1)
 	}
 
-	response, err := request.handle(callback)
+	response, err := request.handle(callbacks)
 	if err != nil {
 		writeError(os.Stdout, err.Error())
 		os.Exit(1)

@@ -6,6 +6,7 @@
 package sdk
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -21,7 +22,7 @@ type Request struct {
 	Form map[string]string
 }
 
-func (request *Request) handle(callback Callback) (*Response, error) {
+func (request *Request) handle(callbacks map[string]Callback) (*Response, error) {
 	response := Response{
 		Version: 1,
 		Code:    "OK",
@@ -29,6 +30,16 @@ func (request *Request) handle(callback Callback) (*Response, error) {
 	}
 
 	request.Method = strings.ToUpper(request.Method)
+
+	key := strings.ToUpper(request.Module)
+	if keyFromPrefs := strings.ToUpper(request.Config.Prefs["MODULE"]); keyFromPrefs != "" {
+		key = keyFromPrefs
+	}
+
+	callback, found := callbacks[key]
+	if !found {
+		return nil, fmt.Errorf("module not found: %s", key)
+	}
 
 	err := callback(request, &response)
 	if err != nil {

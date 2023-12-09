@@ -8,12 +8,10 @@ package sdk
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/stefchris/go-config"
@@ -31,18 +29,7 @@ func RunServer(callbacks map[string]Callback) {
 			return
 		}
 
-		key := strings.ToUpper(request.Module)
-		if keyFromPrefs := strings.ToUpper(request.Config.Prefs["MODULE"]); keyFromPrefs != "" {
-			key = keyFromPrefs
-		}
-
-		callback, found := callbacks[key]
-		if !found {
-			writeError(w, fmt.Sprintf("Module not found: %s", key))
-			return
-		}
-
-		response, err := request.handle(callback)
+		response, err := request.handle(callbacks)
 		if err != nil {
 			writeError(w, err.Error())
 			return
